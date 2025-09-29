@@ -1,0 +1,47 @@
+/*
+ * Copyright (c) 2024 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include <zephyr/dt-bindings/gpio/gpio.h>
+#include <zephyr/dt-bindings/led/led.h>
+
+/ {
+	led_strip: ws2812 {
+		compatible = "worldsemi,ws2812-nrf54l15-hpf";
+
+		/* WS2812 LED strip configuration */
+		pin = <4>;                  /* P1.04 (D0/A0 on XIAO nRF54L15) */
+		port = <1>;                 /* GPIO port 1 */
+		chain-length = <10>;        /* 10 LEDs for testing */
+		color-mapping = <LED_COLOR_ID_GREEN    /* GRB color order for WS2812B */
+				 LED_COLOR_ID_RED
+				 LED_COLOR_ID_BLUE>;
+
+		/* HPF communication configuration */
+		mbox-dev = <&cpuapp_vevif_tx>;  /* MBOX device for ARM->FLPR communication */
+		mbox-channel = <20>;            /* MBOX channel */
+		reset-delay = <280>;            /* Reset delay in microseconds */
+
+		status = "okay";
+	};
+
+	aliases {
+		led-strip = &led_strip;
+	};
+};
+
+/* Enable GPIO port 1 for WS2812 data pin */
+&gpio1 {
+	status = "okay";
+};
+
+/* Enable MBOX communication with FLPR core */
+&cpuapp_vevif_tx {
+	status = "okay";
+};
+
+&cpuapp_vevif_rx {
+	status = "okay";
+};

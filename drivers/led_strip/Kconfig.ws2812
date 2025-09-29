@@ -110,3 +110,37 @@ config WS2812_STRIP_RPI_PICO_PIO
 	help
 	  Enable driver for WS2812 (and compatibles) LED strip using
 	  the Raspberry Pi Pico's PIO.
+
+config WS2812_STRIP_NRF54L15_HPF
+	bool "WS2812 LED strip nRF54L15 HPF driver"
+	default y
+	depends on DT_HAS_WORLDSEMI_WS2812_NRF54L15_HPF_ENABLED
+	depends on SOC_SERIES_NRF54LX
+	select MBOX if !IPC_SERVICE
+	help
+	  Enable driver for WS2812 (and compatibles) LED strip using
+	  the nRF54L15's High Performance Framework (HPF) via the FLPR 
+	  coprocessor. This driver provides precise timing control through
+	  hardware acceleration, ensuring accurate WS2812 signal generation
+	  with ±150ns tolerance.
+
+if WS2812_STRIP_NRF54L15_HPF
+
+config WS2812_HPF_LOG_LEVEL
+	int "WS2812 nRF54L15 HPF driver log level"
+	depends on LOG
+	default 3
+	range 0 4
+	help
+	  Log level for WS2812 nRF54L15 HPF driver.
+	  0 = OFF, 1 = ERROR, 2 = WARNING, 3 = INFO, 4 = DEBUG
+
+config WS2812_HPF_TIMEOUT_MS
+	int "HPF communication timeout in milliseconds"
+	default 100
+	range 10 1000
+	help
+	  Timeout for HPF communication with FLPR core in milliseconds.
+	  Increase if experiencing timeout errors.
+
+endif

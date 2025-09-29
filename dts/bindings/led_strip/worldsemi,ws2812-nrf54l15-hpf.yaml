@@ -1,0 +1,72 @@
+# Copyright (c) 2024 Nordic Semiconductor ASA
+# SPDX-License-Identifier: Apache-2.0
+
+description: |
+  Worldsemi WS2812 LED strip, nRF54L15 HPF binding
+
+  Driver bindings for controlling a WS2812 or compatible LED strip using
+  the nRF54L15's High Performance Framework (HPF) via the FLPR coprocessor.
+
+  This driver leverages the FLPR core for precise timing control of the
+  WS2812 protocol, ensuring accurate signal generation with ±150ns tolerance.
+
+  Communication with the FLPR core can be done via MBOX or ICMSG backends.
+
+compatible: "worldsemi,ws2812-nrf54l15-hpf"
+
+include: [led-strip.yaml, pinctrl-device.yaml]
+
+properties:
+  pin:
+    type: int
+    required: true
+    description: GPIO pin number for WS2812 data output
+
+  port:
+    type: int
+    required: true
+    description: GPIO port number (0 or 1)
+
+  chain-length:
+    type: int
+    required: true
+    description: Number of LEDs in the strip
+
+  color-mapping:
+    type: uint8-array
+    required: true
+    description: |
+      Channel to color mapping as an array of LED_COLOR_ID_* values.
+      For example, [LED_COLOR_ID_GREEN, LED_COLOR_ID_RED, LED_COLOR_ID_BLUE]
+      for GRB LEDs, or [LED_COLOR_ID_RED, LED_COLOR_ID_GREEN, LED_COLOR_ID_BLUE]
+      for RGB LEDs.
+
+  mbox-dev:
+    type: phandle
+    required: true
+    description: |
+      Phandle to the MBOX or IPC service device used for communication
+      with the FLPR core
+
+  mbox-channel:
+    type: int
+    default: 0
+    description: MBOX channel number (for MBOX backend)
+
+  use-icmsg:
+    type: boolean
+    description: |
+      Use ICMSG backend instead of MBOX for communication with FLPR core.
+      If not set, MBOX backend is used.
+
+  ipc-ept-name:
+    type: string
+    default: "ws2812_hpf"
+    description: IPC endpoint name (for ICMSG backend)
+
+  reset-delay:
+    type: int
+    default: 280
+    description: |
+      Reset delay in microseconds. Time to wait after sending data
+      before the LEDs latch the new values.
